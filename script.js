@@ -274,7 +274,17 @@ if (typeof marked === 'undefined') {
 - **Esri Licenses and Resources**: Access to ArcGIS software through the DOI-BIA ELA as part of software services for Tribes and Indian Affairs; public datasets accessible via ArcGIS Hub platform.
 - **Sources**: https://www.bia.gov/bia/ots/dris/bogs, https://www.bia.gov/service/geospatial-software, https://www.bia.gov/service/geospatial-training, https://onemap-bia-geospatial.hub.arcgis.com/.
 
-### 23. BIA Geospatial Software
+### 23. BIA Geospatial Training
+- **Training Programs**:
+  - **Self-Paced Online Courses**: Esri E-Learning (over 400 resources at https://www.esri.com/training/, bookmark: http://www.esri.com/training/Bookmark/P3KS92AX4), Geospatial Training Services (over 40 courses at https://geospatialtraining.com/).
+  - **Instructor-Led Online Training**: Events by BOGS or USGS; The GEO Project with Mississippi State University; Esri Instructor-Led Training.
+  - **On-Site Training**: Information forthcoming.
+  - Focus on GIS for land management, irrigation analysis, forest harvesting, wildland fire analysis, oil and gas management, and economic analyses.
+- **Target Audience**: BIA employees and employees of federally-recognized Tribes (list at https://www.govinfo.gov/content/pkg/FR-2021-01-29/pdf/2021-01606.pdf). Must be active DOI-BIA ELA participants.
+- **Request Process**: Become active ELA participant at https://www.bia.gov/service/geospatial-software/apply-ela. Contact Geospatial Support Help Desk at geospatial@bia.gov or the Regional Geospatial Coordinator at MWRGIS@bia.gov for access. Registration for events opens ~30 days prior.
+- **Sources**: https://www.bia.gov/service/geospatial-training, https://onemap-bia-geospatial.hub.arcgis.com/pages/training.
+
+### 24. BIA Geospatial Software
 - **Eligibility**: Available to authorized Bureau of Indian Affairs (BIA) employees and employees of federally recognized Tribal Governments. Limited to approved DOI-BIA ELA program organizations as per the ELA Participation Policy (https://www.bia.gov/sites/default/files/dup/assets/public/pdf/idc015893.pdf).
 - **Supported Software**:
   - **DOI-BIA Esri Enterprise License Agreement (ELA)**: ArcGIS core software and limited extensions, select Esri e-Learning courses and workshops, paid maintenance for existing products, a limited number of Esri specialty products, discounts on other Esri and third-party products, technical support.
@@ -284,16 +294,6 @@ if (typeof marked === 'undefined') {
 - **Request Process**: Apply to become approved under DOI-BIA ELA at https://www.bia.gov/service/geospatial-software/apply-ela. For current versions or support, contact geospatial@bia.gov or the Regional Geospatial Coordinator at MWRGIS@bia.gov.
 - **License Agreements and Usage Policies**: Governed by ELA Participation Policy (https://www.bia.gov/sites/default/files/dup/assets/public/pdf/idc015893.pdf).
 - **Sources**: https://www.bia.gov/service/geospatial-software.
-
-### 24. BIA Geospatial Training
-- **Training Programs**:
-  - **Self-Paced Online Courses**: Esri E-Learning (over 400 resources at https://www.esri.com/training/, bookmark: http://www.esri.com/training/Bookmark/P3KS92AX4), Geospatial Training Services (over 40 courses at https://geospatialtraining.com/).
-  - **Instructor-Led Online Training**: Events by BOGS or USGS; The GEO Project with Mississippi State University; Esri Instructor-Led Training.
-  - **On-Site Training**: Information forthcoming.
-  - Focus on GIS for land management, irrigation analysis, forest harvesting, wildland fire analysis, oil and gas management, and economic analyses.
-- **Target Audience**: BIA employees and employees of federally-recognized Tribes (list at https://www.govinfo.gov/content/pkg/FR-2021-01-29/pdf/2021-01606.pdf). Must be active DOI-BIA ELA participants.
-- **Request Process**: Become active ELA participant at https://www.bia.gov/service/geospatial-software/apply-ela. Contact Geospatial Support Help Desk at geospatial@bia.gov or the Regional Geospatial Coordinator at MWRGIS@bia.gov for access. Registration for events opens ~30 days prior.
-- **Sources**: https://www.bia.gov/service/geospatial-training, https://onemap-bia-geospatial.hub.arcgis.com/pages/training.
 
 ### 25. BIA Geospatial Open Data Hub
 - **Overview**: The BIA Open Data Portal (https://onemap-bia-geospatial.hub.arcgis.com/) provides national level geospatial data in the public domain to support tribal community resiliency, research, and more. Maintained by the Branch of Geospatial Support. Serves as a repository for BIA geodata, applications, and resources.
