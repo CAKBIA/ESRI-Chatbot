@@ -142,10 +142,12 @@ const App = () => {
       }
     }
 
-    // Ensure links open in new window by modifying botText
-    botText = botText.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+    // Process text to ensure links open in new window
+    const processedText = botText.replace(/(https?:\/\/[^\s]+)/g, url => {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    });
 
-    setMessages((curr) => [...curr, { text: botText, sender: 'bot' }]);
+    setMessages((curr) => [...curr, { text: processedText, sender: 'bot' }]);
     setIsLoading(false);
   };
 
