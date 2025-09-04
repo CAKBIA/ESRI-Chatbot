@@ -288,12 +288,17 @@ const App = () => {
 
 ### 24. BIA Geospatial Training
 - **Training Programs**:
-  - **Self-Paced Online Courses**: Esri E-Learning (over 400 resources at https://www.esri.com/training/, bookmark: http://www.esri.com/training/Bookmark/P3KS92AX4), Geospatial Training Services (over 40 courses at https://geospatialtraining.com/).
-  - **Instructor-Led Online Training**: Events by BOGS or USGS; The GEO Project with Mississippi State University; Esri Instructor-Led Training.
-  - **On-Site Training**: Information forthcoming.
-  - Focus on GIS for land management, irrigation analysis, forest harvesting, wildland fire analysis, oil and gas management, and economic analyses.
+  - **Self-Paced Online Courses**:
+    - **Esri E-Learning**: All resources listed as free or requiring a maintenance subscription in Esri’s e-Learning Course Catalog are included in the DOI-BIA ELA program, with over 400 qualifying resources. Email the Geospatial Support Help Desk to request access, and you’ll receive an invitation email with instructions for your Esri account.
+    - **Geospatial Training Services**: Offers over 40 online courses including lectures, exercise instructions, and files. Contact the Geospatial Support Help Desk for access.
+  - **Instructor-Led Online Training Events**:
+    - **BOGS-Led Events**: Upcoming events with USGS partnerships will be listed as available.
+    - **The GEO Project**: Partnered with Mississippi State University, offering courses with limited capacity, registration required, and instructor support for a finite period. Details in the Events section below.
+    - **Esri Instructor-Led Training**: Periodically available, with registration opening 30 days prior and status updates two weeks before start dates. Priority may apply for specific audiences.
+  - **On-Site Training Events**: Information forthcoming.
+  - **Focus**: GIS for land management, irrigation analysis, forest harvesting, wildland fire analysis, oil and gas management, and economic analyses.
 - **Target Audience**: BIA employees and employees of federally-recognized Tribes (list at https://www.govinfo.gov/content/pkg/FR-2021-01-29/pdf/2021-01606.pdf). Must be active DOI-BIA ELA participants.
-- **Request Process**: Become active ELA participant at https://www.bia.gov/service/geospatial-software/apply-ela. Contact Geospatial Support Help Desk at geospatial@bia.gov or the Regional Geospatial Coordinator at MWRGIS@bia.gov for access. Registration for events opens ~30 days prior.
+- **Request Process**: Become an active ELA participant at https://www.bia.gov/service/geospatial-software/apply-ela. Contact the Geospatial Support Help Desk at geospatial@bia.gov for access to learning platforms. Registration for events opens ~30 days prior, with status notifications two weeks before start.
 - **Sources**: https://www.bia.gov/service/geospatial-training, https://onemap-bia-geospatial.hub.arcgis.com/pages/training.
 
 ### 25. BIA Geospatial Open Data Hub
