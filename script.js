@@ -221,35 +221,19 @@ const App = () => {
         botText = 'Oops, looks like I need a valid ArcGIS service URL to work my magic! Try something like "What are the layers in this service: https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer" — I’ll figure it out with you!';
       }
     } else if (userInput.toLowerCase().includes('bia') && (userInput.toLowerCase().includes('training') || userInput.toLowerCase().includes('courses'))) {
+      // Use the internal knowledge base directly, no external API call needed for this query.
       const biaTrainingInfo = knowledgeBase['bia gis training'];
-      const systemPrompt = `You are ESRI-Chatbot, a friendly and professional technical support assistant for Esri GIS products and BIA-related geospatial queries. Your responses should be conversational, helpful, and concise. Never mention AI. Summarize information from the provided data. Do not use numbered lists from the source; format it naturally.`;
-      const userPrompt = `Summarize the following information about BIA GIS training to answer the user's query: ${JSON.stringify(biaTrainingInfo)}`;
-      const payload = {
-          contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-          systemInstruction: { parts: [{ text: systemPrompt }] },
-      };
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      
+      const programsList = biaTrainingInfo.programs.map(p => `- ${p}`).join('\n');
+      const topicsList = biaTrainingInfo.topics.map(t => `- ${t}`).join('\n');
 
-      try {
-          const apiCall = async () => {
-              const response = await fetch(apiUrl, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(payload),
-              });
-              if (!response.ok) throw new Error(`API error: ${response.status} ${response.statusText}`);
-              const result = await response.json();
-              if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
-                  return result.candidates[0].content.parts[0].text;
-              } else {
-                  throw new Error('No valid response received from API.');
-              }
-          };
-          botText = await callApiWithBackoff(apiCall);
-      } catch (error) {
-          console.error('API call failed for internal knowledge:', error);
-          botText = `I apologize, I am unable to provide information on BIA GIS training at this moment. Please try again later.`;
-      }
+      botText = `Hello! I can definitely help with that. Here is the information about BIA GIS training:\n\n` +
+                `**Summary:** ${biaTrainingInfo.summary}\n\n` +
+                `**Training Programs:**\n${programsList}\n\n` +
+                `**Training Topics Include:**\n${topicsList}\n\n` +
+                `**Requirements & Access:** ${biaTrainingInfo.requirements}\n\n` +
+                `**How to Get Started:** ${biaTrainingInfo.access_info}\n\n` +
+                `I hope this helps! If you need anything else, I'm here to assist.`;
     } else {
       try {
         // Fetch search results for advanced queries
