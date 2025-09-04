@@ -17,7 +17,6 @@ const renderer = {
 // Use the custom renderer with the marked library
 marked.use({ renderer });
 
-
 const App = () => {
   const [messages, setMessages] = React.useState([]);
   const [input, setInput] = React.useState('');
@@ -29,6 +28,29 @@ const App = () => {
   const apiKey = "AIzaSyADvIoS1NcspmkXp3sHYrD38zhh1DlBXAM"; // Replace if invalid
   const model = "gemini-1.5-flash"; // Stable model
   const cx = "25ed03fb10e654c08"; // Replace with your Google CSE ID
+
+  // Internal knowledge base for specific, common queries
+  const knowledgeBase = {
+    'bia gis training': {
+      summary: "The BIA Branch of Geospatial Support (BOGS) provides GIS software, training, and technical support to BIA employees and employees of federally-recognized Tribes.",
+      programs: [
+        "**Online Courses:** Self-paced courses via Esri E-Learning and Geospatial Training Services.",
+        "**Instructor-Led Training:** Offered online through BOGS or USGS, The GEO Project with Mississippi State University, and Esri.",
+        "**On-Site Training:** Information is forthcoming."
+      ],
+      topics: [
+        "GIS for land management",
+        "irrigation analysis",
+        "forest harvesting",
+        "wildland fire analysis",
+        "oil and gas management",
+        "economic analyses"
+      ],
+      requirements: "Training is for active DOI-BIA ELA participants (BIA employees and employees of federally-recognized Tribes).",
+      access_info: "To request access, become an active ELA participant at https://www.bia.gov/service/geospatial-software/apply-ela. For more help, contact the Geospatial Support Help Desk at geospatial@bia.gov."
+    }
+  };
+
 
   // Add event listener to handle link clicks
   React.useEffect(() => {
@@ -197,6 +219,36 @@ const App = () => {
         botText = `Great question! Here’s the scoop on that service URL: ${botText} Let me know if you need more details—I’m learning from you to get even better!`;
       } else {
         botText = 'Oops, looks like I need a valid ArcGIS service URL to work my magic! Try something like "What are the layers in this service: https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer" — I’ll figure it out with you!';
+      }
+    } else if (userInput.toLowerCase().includes('bia') && (userInput.toLowerCase().includes('training') || userInput.toLowerCase().includes('courses'))) {
+      const biaTrainingInfo = knowledgeBase['bia gis training'];
+      const systemPrompt = `You are ESRI-Chatbot, a friendly and professional technical support assistant for Esri GIS products and BIA-related geospatial queries. Your responses should be conversational, helpful, and concise. Never mention AI. Summarize information from the provided data. Do not use numbered lists from the source; format it naturally.`;
+      const userPrompt = `Summarize the following information about BIA GIS training to answer the user's query: ${JSON.stringify(biaTrainingInfo)}`;
+      const payload = {
+          contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+      };
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+      try {
+          const apiCall = async () => {
+              const response = await fetch(apiUrl, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload),
+              });
+              if (!response.ok) throw new Error(`API error: ${response.status} ${response.statusText}`);
+              const result = await response.json();
+              if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                  return result.candidates[0].content.parts[0].text;
+              } else {
+                  throw new Error('No valid response received from API.');
+              }
+          };
+          botText = await callApiWithBackoff(apiCall);
+      } catch (error) {
+          console.error('API call failed for internal knowledge:', error);
+          botText = `I apologize, I am unable to provide information on BIA GIS training at this moment. Please try again later.`;
       }
     } else {
       try {
