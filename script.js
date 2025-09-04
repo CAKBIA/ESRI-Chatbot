@@ -22,7 +22,7 @@ const App = () => {
     try {
       const storedMessages = JSON.parse(localStorage.getItem('esriChatMessages') || '[]');
       setMessages(storedMessages.length > 0 ? storedMessages : [
-        { text: 'Hello! I’m BIA Geo-Assist, your friendly GIS sidekick for Esri and BIA-related geospatial queries. Ask me anything about ArcGIS tools, BIA Branch of Geospatial Support (BOGS), or troubleshooting—I’m here to help with a smile!', sender: 'bot' }
+        { text: 'Hello! I’m ESRI-Chatbot, your friendly GIS sidekick for Esri and BIA-related geospatial queries. Ask me anything about ArcGIS tools, BIA Branch of Geospatial Support (BOGS), or troubleshooting—I’m here to help with a smile!', sender: 'bot' }
       ]);
     } catch (e) {
       console.error('Failed to load messages from localStorage:', e);
@@ -54,14 +54,14 @@ const App = () => {
   const saveConversation = () => {
     try {
       const conversationText = messages.map(msg => 
-        `${msg.sender === 'user' ? 'You' : 'BIA Geo-Assist'}: ${msg.text}`
+        `${msg.sender === 'user' ? 'You' : 'ESRI-Chatbot'}: ${msg.text}`
       ).join('\n\n');
       const blob = new Blob([conversationText], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      a.download = `bia_geo_assist_conversation_${timestamp}.txt`;
+      a.download = `esri_chatbot_conversation_${timestamp}.txt`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {
@@ -349,14 +349,11 @@ const App = () => {
       }
     };
 
-    // Fetch Esri docs using Google Custom Search API
+    // Fetch Esri search results (Google Custom Search)
     const fetchEsriSearchResults = async (query) => {
       const cacheKey = `esri_search_${query}`;
       const cached = localStorage.getItem(cacheKey);
-      if (cached) {
-        console.log('Using cached search results for:', query);
-        return cached;
-      }
+      if (cached) return cached;
 
       try {
         const searchUrl = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query + ' site:doc.arcgis.com OR site:developers.arcgis.com OR site:support.esri.com OR site:community.esri.com OR site:bia.gov')}&num=5`;
@@ -365,12 +362,10 @@ const App = () => {
         const data = await response.json();
         if (data.items) {
           const result = data.items.map(item => `- **${item.title}**: ${item.snippet} (Source: ${item.link})`).join('\n');
-          localStorage.setItem(cacheKey, result); // Cache for 24 hours
-          setTimeout(() => localStorage.removeItem(cacheKey), 24 * 60 * 60 * 1000); // Expire cache
-          console.log('Search results fetched:', result);
+          localStorage.setItem(cacheKey, result);
+          setTimeout(() => localStorage.removeItem(cacheKey), 24 * 60 * 60 * 1000);
           return result;
         }
-        console.log('No search results found for:', query);
         return 'No search results found.';
       } catch (error) {
         console.error('Search failed:', error);
@@ -403,13 +398,12 @@ const App = () => {
       } else {
         botText = 'Oops, looks like I need a valid ArcGIS service URL to work my magic! Try something like "What are the layers in this service: https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer" — I’ll figure it out with you!';
       }
-      setMessages((curr) => [...curr, { text: botText, sender: 'bot' }]);
     } else {
       try {
         // Fetch search results for advanced queries
         const searchResults = userInput.toLowerCase().includes('what is gis') ? '' : await fetchEsriSearchResults(userInput);
         const prompt = `
-          You are BIA Geo-Assist, a friendly and professional technical support assistant for Esri GIS products and BIA-related geospatial queries. Respond in a structured format with headings, bullets, examples, and sources. Add a cheerful tone, use phrases like 'great question!' or 'let’s tackle this together!', and encourage follow-ups. For basic questions like 'What is GIS?', prioritize the knowledge base. For advanced or specific queries, use search results if relevant, then supplement with the knowledge base. Include BIA-specific information from the knowledge base for relevant queries (e.g., BOGS contact, software, training). Cite sources inline (e.g., Esri Documentation, BIA Website). Learn from the user’s input by adapting responses based on their previous questions if applicable. Do not mention AI.
+          You are ESRI-Chatbot, a friendly and professional technical support assistant for Esri GIS products and BIA-related geospatial queries. Respond in a structured format with headings, bullets, examples, and sources. Add a cheerful tone, use phrases like 'great question!' or 'let’s tackle this together!', and encourage follow-ups. For basic questions like 'What is GIS?', prioritize the knowledge base. For advanced or specific queries, use search results if relevant, then supplement with the knowledge base. Include BIA-specific information from the knowledge base for relevant queries (e.g., BOGS contact, software, training). Cite sources inline (e.g., Esri Documentation, BIA Website). Learn from the user’s input by adapting responses based on their previous questions if applicable. Do not mention AI.
           Online Search Results: ${searchResults}
           Knowledge Base: ${esriKnowledgeBase}
           User Query: ${userInput}
@@ -438,7 +432,6 @@ const App = () => {
         };
         
         botText = await callApiWithBackoff(apiCall);
-        setMessages((curr) => [...curr, { text: botText, sender: 'bot' }]);
       } catch (error) {
         console.error('API call failed:', error);
         const searchUrl = `https://doc.arcgis.com/en/search/?q=${encodeURIComponent(userInput)}`;
@@ -454,16 +447,17 @@ const App = () => {
           fallbackText += `Try checking the [Esri Documentation for "${userInput}"](${searchUrl}) or toss me a rephrased question—I’ll do my best to assist!`;
         }
         botText = fallbackText;
-        setMessages((curr) => [...curr, { text: botText, sender: 'bot' }]);
       }
     }
+
+    setMessages((curr) => [...curr, { text: botText, sender: 'bot' }]);
     setIsLoading(false);
   };
 
   const BotMessage = ({ message }) => (
     <div className="flex items-start mb-4">
       <div className="flex-shrink-0 w-8 h-8 rounded-full bg-esriBlue flex items-center justify-center text-white font-bold text-sm mr-2">
-        GA
+        EC
       </div>
       <div className="bg-esriLightBlue p-3 rounded-xl shadow-sm max-w-lg message-content">
         <div
@@ -518,7 +512,7 @@ const App = () => {
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z"/>
             </svg>
           </div>
-          <h1 className="text-xl font-bold">BIA Geo-Assist</h1>
+          <h1 className="text-xl font-bold">ESRI-Chatbot</h1>
         </div>
         <div className="flex space-x-2">
           <button
@@ -538,7 +532,7 @@ const App = () => {
       <div className="flex-1 overflow-y-auto p-4 bg-esriGray chat-scroll-container">
         {messages.length === 0 && (
           <div className="flex items-center justify-center h-full text-center text-gray-500">
-            <p className="text-lg">Your conversation with BIA Geo-Assist will appear here.</p>
+            <p className="text-lg">Your conversation with ESRI-Chatbot will appear here.</p>
           </div>
         )}
         {messages.map((msg, index) => (
@@ -551,7 +545,7 @@ const App = () => {
         {isLoading && (
           <div className="flex items-start mb-4">
             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-esriBlue flex items-center justify-center text-white font-bold text-sm mr-2">
-              GA
+              EC
             </div>
             <div className="flex items-center space-x-1 p-3">
               <div className="w-2 h-2 rounded-full bg-gray-500 animate-pulse-dot"></div>
