@@ -25,9 +25,32 @@ const App = () => {
   const [showConfirmModal, setShowConfirmModal] = React.useState(false);
   const messagesEndRef = React.useRef(null);
   const inputRef = React.useRef(null);
+  const chatContainerRef = React.useRef(null);
   const apiKey = "AIzaSyADvIoS1NcspmkXp3sHYrD38zhh1DlBXAM"; // Replace if invalid
   const model = "gemini-1.5-flash"; // Stable model
   const cx = "25ed03fb10e654c08"; // Replace with your Google CSE ID
+
+  // Add event listener to handle link clicks
+  React.useEffect(() => {
+    const handleLinkClick = (event) => {
+      // Check if the clicked element is an anchor tag
+      if (event.target.tagName === 'A') {
+        event.preventDefault(); // Prevent default navigation
+        window.open(event.target.href, '_blank'); // Open link in new tab
+      }
+    };
+
+    const container = chatContainerRef.current;
+    if (container) {
+      container.addEventListener('click', handleLinkClick);
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener('click', handleLinkClick);
+      }
+    };
+  }, []);
 
   // Load stored messages or initial welcome
   React.useEffect(() => {
@@ -328,8 +351,21 @@ const App = () => {
     setIsLoading(true);
 
     let botText = '';
-    
-    // Fetch ArcGIS REST API metadata
+
+    // A. PRIORITY CHECK: Direct match for BIA training question
+    const biaRegex = /\b(bia|bogs)\b/i;
+    const trainingRegex = /\b(training|course|workshop|website)\b/i;
+    if (biaRegex.test(userInput) && trainingRegex.test(userInput)) {
+      const biaTrainingSection = esriKnowledgeBase.match(/### 24\. BIA Geospatial Training[\s\S]*?(?=###|$)/)?.[0];
+      const biaContactSection = esriKnowledgeBase.match(/### 22\. BIA Branch of Geospatial Support \(BOGS\)[\s\S]*?(?=###|$)/)?.[0];
+
+      botText = `Great question! Here is the detailed information you requested about BIA geospatial training and contact information:\n\n${biaTrainingSection}\n\n${biaContactSection}\n\nI hope this helps! If you need anything else, I'm here to assist.`;
+      setMessages((curr) => [...curr, { text: botText, sender: 'bot' }]);
+      setIsLoading(false);
+      return;
+    }
+
+    // B. SECONDARY CHECK: URL and REST API metadata
     const fetchServiceMetadata = async (url) => {
       try {
         if (!url.includes('arcgis') || !url.match(/\/rest\/services\/[^/]+\/(MapServer|FeatureServer)/)) {
@@ -361,7 +397,7 @@ const App = () => {
           return `Failed to retrieve metadata for ${url}. Ensure the URL is a valid, accessible ArcGIS REST service. Error: ${error.message}`;
       }
     };
-
+    
     // Fetch Esri search results (Google Custom Search)
     const fetchEsriSearchResults = async (query) => {
       const cacheKey = `esri_search_${query}`;
@@ -402,13 +438,7 @@ const App = () => {
       }
     };
 
-    // Handle user input with personality
-    if (userInput.toLowerCase().includes('bia') && userInput.toLowerCase().includes('training')) {
-      const biaTrainingSection = esriKnowledgeBase.match(/### 24\. BIA Geospatial Training[\s\S]*?(?=###|$)/)[0];
-      const biaContactSection = esriKnowledgeBase.match(/### 22\. BIA Branch of Geospatial Support \(BOGS\)[\s\S]*?(?=###|$)/)[0];
-
-      botText = `Great question! Here is the detailed information you requested about BIA geospatial training and contact information:\n\n${biaTrainingSection}\n\n${biaContactSection}\n\nI hope this helps! If you need anything else, I'm here to assist.`;
-    } else if (userInput.toLowerCase().includes('service url') || userInput.toLowerCase().includes('rest api') || userInput.match(/https?:\/\//)) {
+    if (userInput.toLowerCase().includes('service url') || userInput.toLowerCase().includes('rest api') || userInput.match(/https?:\/\//)) {
       const urlMatch = userInput.match(/https?:\/\/[^\s]+/);
       if (urlMatch) {
         botText = await fetchServiceMetadata(urlMatch[0]);
@@ -456,11 +486,11 @@ const App = () => {
         let fallbackText = `Oh no, I hit a snag! I couldn’t fetch that info (Error: ${error.message}). `;
 
         if (userInput.toLowerCase().includes('what is gis')) {
-          fallbackText += `But no worries, here’s what I know: ${esriKnowledgeBase.match(/### 1\. What is GIS\?[\s\S]*?(?=###|$)/)[0]} Let’s explore more if you’d like!`;
+          fallbackText += `But no worries, here’s what I know: ${esriKnowledgeBase.match(/### 1\. What is GIS\?[\s\S]*?(?=###|$)/)?.[0]} Let’s explore more if you’d like!`;
         } else if (userInput.toLowerCase().includes('experience builder') && userInput.toLowerCase().includes('dashboard')) {
-          fallbackText += `No problem, let’s pivot! Here’s the rundown: ${esriKnowledgeBase.match(/### 18\. Creating a Dashboard in ArcGIS Experience Builder[\s\S]*?(?=###|$)/)[0]} Got more questions? I’m all ears!`;
+          fallbackText += `No problem, let’s pivot! Here’s the rundown: ${esriKnowledgeBase.match(/### 18\. Creating a Dashboard in ArcGIS Experience Builder[\s\S]*?(?=###|$)/)?.[0]} Got more questions? I’m all ears!`;
         } else if (userInput.toLowerCase().includes('bia') || userInput.toLowerCase().includes('geospatial') || userInput.toLowerCase().includes('bogs')) {
-          fallbackText += `Let’s tackle this together! Here’s some info from my BIA knowledge base: ${esriKnowledgeBase.match(/### 22\. BIA Branch of Geospatial Support \(BOGS\)[\s\S]*?(?=###|$)/)[0]} For more, contact geospatial@bia.gov or MWRGIS@bia.gov. Want to dive deeper?`;
+          fallbackText += `Let’s tackle this together! Here’s some info from my BIA knowledge base: ${esriKnowledgeBase.match(/### 22\. BIA Branch of Geospatial Support \(BOGS\)[\s\S]*?(?=###|$)/)?.[0]} For more, contact geospatial@bia.gov or MWRGIS@bia.gov. Want to dive deeper?`;
         } else {
           fallbackText += `Try checking the [Esri Documentation for "${userInput}"](${searchUrl}) or toss me a rephrased question—I’ll do my best to assist!`;
         }
@@ -547,7 +577,7 @@ const App = () => {
           </button>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto p-4 bg-esriGray chat-scroll-container">
+      <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 bg-esriGray chat-scroll-container">
         {messages.length === 0 && (
           <div className="flex items-center justify-center h-full text-center text-gray-500">
             <p className="text-lg">Your conversation with ESRI-Chatbot will appear here.</p>
