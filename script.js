@@ -132,15 +132,18 @@ const App = () => {
     } else {
       // Direct knowledge base response for specific queries
       if (userInput.toLowerCase().includes('what is gis')) {
-        botText = esriKnowledgeBase.match(/### 1\. What is GIS\?[\s\S]*?(?=###|$)/)[0];
+        botText = esriKnowledgeBase.match(/### 1\. What is GIS\?[\s\S]*?(?=###|$)/)[0].replace(/### 1\. What is GIS\?\n/, '');
         botText = `Great question! ${botText} Let me know if you’d like more info!`;
       } else if (userInput.toLowerCase().includes('bia') && userInput.toLowerCase().includes('training')) {
-        botText = esriKnowledgeBase.match(/### 24\. BIA Geospatial Training[\s\S]*?(?=###|$)/)[0];
+        botText = esriKnowledgeBase.match(/### 24\. BIA Geospatial Training[\s\S]*?(?=###|$)/)[0].replace(/### 24\. BIA Geospatial Training\n/, '');
         botText = `Great question! ${botText} Visit the site for more details. Let me know how else I can assist!`;
       } else {
-        botText = 'I don’t have enough specific information to answer that accurately from my knowledge base. Please provide more details or ask about GIS basics or BIA training, and I’ll respond with what I know.';
+        botText = 'I don’t have enough specific information to answer that accurately from my knowledge base. Please ask about GIS basics or BIA training, and I’ll provide what I know.';
       }
     }
+
+    // Ensure links open in new window by modifying botText
+    botText = botText.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 
     setMessages((curr) => [...curr, { text: botText, sender: 'bot' }]);
     setIsLoading(false);
