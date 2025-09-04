@@ -78,7 +78,8 @@ const App = () => {
       URL.revokeObjectURL(url);
     } catch (e) {
       console.error('Failed to save conversation:', e);
-      alert('Sorry, there was an error saving the conversation. Please try again.');
+      // Replaced alert with a message box for better user experience
+      setMessages((curr) => [...curr, { text: 'Sorry, there was an error saving the conversation. Please try again.', sender: 'bot' }]);
     }
   };
 
@@ -402,7 +403,12 @@ const App = () => {
     };
 
     // Handle user input with personality
-    if (userInput.toLowerCase().includes('service url') || userInput.toLowerCase().includes('rest api') || userInput.match(/https?:\/\//)) {
+    if (userInput.toLowerCase().includes('bia') && userInput.toLowerCase().includes('training')) {
+      const biaTrainingSection = esriKnowledgeBase.match(/### 24\. BIA Geospatial Training[\s\S]*?(?=###|$)/)[0];
+      const biaContactSection = esriKnowledgeBase.match(/### 22\. BIA Branch of Geospatial Support \(BOGS\)[\s\S]*?(?=###|$)/)[0];
+
+      botText = `Great question! Here is the detailed information you requested about BIA geospatial training and contact information:\n\n${biaTrainingSection}\n\n${biaContactSection}\n\nI hope this helps! If you need anything else, I'm here to assist.`;
+    } else if (userInput.toLowerCase().includes('service url') || userInput.toLowerCase().includes('rest api') || userInput.match(/https?:\/\//)) {
       const urlMatch = userInput.match(/https?:\/\/[^\s]+/);
       if (urlMatch) {
         botText = await fetchServiceMetadata(urlMatch[0]);
