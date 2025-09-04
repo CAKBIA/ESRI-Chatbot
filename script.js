@@ -202,14 +202,15 @@ const App = () => {
       try {
         // Fetch search results for advanced queries
         const searchResults = await fetchEsriSearchResults(userInput);
-        const prompt = `
-          You are ESRI-Chatbot, a friendly and professional technical support assistant for Esri GIS products and BIA-related geospatial queries. Respond in a structured format with headings, bullets, examples, and sources. Add a cheerful tone, use phrases like 'great question!' or 'let’s tackle this together!', and encourage follow-ups. Do not mention AI.
-          Online Search Results: ${searchResults}
-          User Query: ${userInput}
-          Previous Context: ${messages.map(m => m.text).join('\n')}
-        `;
+        const systemPrompt = `You are ESRI-Chatbot, a friendly and professional technical support assistant for Esri GIS products and BIA-related geospatial queries. Your responses should be conversational, helpful, and concise. Never mention AI. Always summarize information; do not use numbered lists or sections from source material.`;
+        const userPrompt = `Summarize the following online search results to answer the user's query.
+Online Search Results: ${searchResults}
+User Query: ${userInput}
+Previous Context: ${messages.map(m => m.text).join('\n')}
+`;
         const payload = {
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+          systemInstruction: { parts: [{ text: systemPrompt }] },
         };
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
