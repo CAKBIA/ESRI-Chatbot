@@ -353,7 +353,7 @@ Previous Messages: ${messages.map(m => m.text).join('\n')}
       `.trim();
 
       try {
-        const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+        const resp = await fetch(`https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }] })
