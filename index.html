@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BIA GIS Technical Support</title>
-  
+  <title>BIA Geo-Assist</title>
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Tailwind config -->
+
+  <!-- Tailwind Config -->
   <script>
     tailwind.config = {
       theme: {
@@ -18,29 +18,35 @@
             esriLightBlue: '#9496b3',
             esriGray: '#f8f8f8',
           },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
         },
       },
     };
   </script>
-  
-  <!-- External stylesheet -->
-  <link rel="stylesheet" href="style.css">
-  
-  <!-- React, ReactDOM, Marked, and DOMPurify -->
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-gray-100 font-sans flex items-center justify-center min-h-screen p-4">
+  <div id="root" class="w-full max-w-2xl h-[90vh] flex flex-col chat-container"></div>
+
+  <!-- Libraries -->
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@4.0.0/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.0/purify.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.22.5/babel.min.js"></script>
-</head>
 
-<body class="bg-gray-100 font-sans flex items-center justify-center min-h-screen p-4">
-  <div id="root" class="w-full max-w-2xl h-[90vh] flex flex-col chat-container"></div>
+  <!-- Load API Key Safely -->
+  <script>
+    // This will be replaced by script.js
+    window.GEMINI_KEY = null;
+  </script>
 
-  <!-- External JavaScript -->
-  <script type="text/babel" src="script.js"></script>
+  <!-- Main App -->
+  <script src="script.js" type="text/babel"></script>
 </body>
 </html>
