@@ -414,20 +414,24 @@ const App = () => {
                 const payload = {
                     contents: [{ role: "user", parts: [{ text: prompt }] }],
                 };
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                const response = await fetch(
+                    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            contents: [{ role: "user", parts: [{ text: prompt }] }]
+                        })
+                    }
+                );
 
-                const apiCall = async () => {
-                    console.log('Sending API request to:', apiUrl);
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload),
-                    });
-                    if (!response.ok) throw new Error(`API error: ${response.status} ${response.statusText}`);
-                    const result = await response.json();
-                    console.log('API response:', result);
-                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
-                        return result.candidates[0].content.parts[0].text;
+                if (!response.ok) {
+                    const err = await response.text();
+                    throw new Error("Gemini API error: " + response.status + " " + err);
+                }
+
+                const data = await response.json();
+                botText = data.candidates[0].content.parts[0].text;
                     } else {
                         throw new Error('No valid response received from API.');
                     }
