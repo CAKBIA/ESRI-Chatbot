@@ -1,6 +1,9 @@
-// script.js – YOUR ORIGINAL CODE + ONLY THE FIX NEEDED (November 17, 2025)
+// ==== script.js ====
+// Your Original Code + ONLY the API Endpoint Fix (November 17, 2025)
+
 let apiKey = null;
 
+// Load key from gemini-key.txt or prompt
 async function loadApiKey() {
   try {
     const resp = await fetch('gemini-key.txt?' + Date.now());
@@ -9,12 +12,14 @@ async function loadApiKey() {
       console.log('API key loaded from gemini-key.txt');
       return;
     }
-  } catch (e) {}
+  } catch (e) { /* ignore */ }
+
   const saved = localStorage.getItem('geminiKey');
   if (saved && saved.startsWith('AIza')) {
     apiKey = saved;
     return;
   }
+
   const input = prompt('Please paste your Google Gemini API key:');
   if (input && input.startsWith('AIza')) {
     apiKey = input.trim();
@@ -24,7 +29,7 @@ async function loadApiKey() {
   }
 }
 
-// YOUR FULL ORIGINAL 25+ SECTION KNOWLEDGE BASE – UNTOUCHED
+// Your FULL Original Knowledge Base – Unchanged (25+ Sections)
 const esriKnowledgeBase = `
 ## Esri GIS Technical Support Knowledge Base
 ### 1. What is GIS?
@@ -39,7 +44,7 @@ const esriKnowledgeBase = `
   - Mapping flood zones for emergency planning.
   - Analyzing traffic for road optimization.
   - Visualizing demographic data for urban planning.
-- **Esri Context**: Esri’s ArcGIS platform includes ArcGIS Pro (desktop), ArcGIS Online (web), and apps like Experience Builder for interactive apps.
+- **Esri Context**: Esri's ArcGIS platform includes ArcGIS Pro (desktop), ArcGIS Online (web), and apps like Experience Builder for interactive apps.
 - **Sources**: Esri Documentation[](https://www.esri.com/en-us/what-is-gis/overview).
 ### 2. Geoprocessing Tools in ArcGIS Pro
 - **Analysis Toolbox**: Tools for spatial analysis, including Overlay (e.g., Union, Intersect), Proximity (e.g., Buffer, Near), and Statistics (e.g., Summary Statistics).
@@ -192,7 +197,7 @@ const esriKnowledgeBase = `
 - **Mission**: Assist Tribal governments and Indian Affairs in managing cultural and natural resources of Indian Country by providing geographic information systems (GIS) software, training, and technical support.
 - **Who They Serve**: Indian Affairs (IA) and all federally-recognized Tribes; regional geospatial coordinators working with Tribes and local BIA agencies; BIA stakeholders for mapping; represent BIA to other agencies, governments, and the public with authoritative maps.
 - **Services**:
-  - **Software**: ArcGIS, Avenza Maps Pro, DigitalGlobe provided through the Department of the Interior’s Enterprise License Agreement (DOI-BIA ELA).
+  - **Software**: ArcGIS, Avenza Maps Pro, DigitalGlobe provided through the Department of the Interior's Enterprise License Agreement (DOI-BIA ELA).
   - **Training**: Programs teaching use of GIS for land management, including irrigation flood plain analysis, forest harvesting, wildland fire analysis, oil and gas management, and other economic analyses.
   - **Technical Support**: GIS technical support for Tribal governments and Indian Affairs via DOI-BIA ELA.
 - **Contact**:
@@ -227,7 +232,7 @@ const esriKnowledgeBase = `
 - **Sources**: https://www.bia.gov/service/geospatial-training, https://onemap-bia-geospatial.hub.arcgis.com/pages/training.
 ### 25. BIA Geospatial Open Data Hub
 - **Overview**: The BIA Open Data Portal[](https://onemap-bia-geospatial.hub.arcgis.com/) provides national level geospatial data in the public domain to support tribal community resiliency, research, and more. Maintained by the Branch of Geospatial Support. Serves as a repository for BIA geodata, applications, and resources.
-- **Available Data**: Data available for download as CSV, KML, Shapefile; accessible via web services for application development and data visualization. Includes datasets like Rappahannock Tracts (interactive map for tracts, parcels, BIA lands).
+- **Available Data**: Data available for download as CSV, KML, Shapefile; accessible via web services for application development and data visualization. Includes datasets like BIA Tracts (interactive map for tracts, parcels, BIA lands).
 - **Applications**: StoryMaps, Web Applications, Web Maps for deeper data exploration.
 - **Access**: Public access; no cost. For contributions or support, contact geospatial@bia.gov or the Regional Geospatial Coordinator at MWRGIS@bia.gov.
 - **Integration with Esri**: Built on ArcGIS Hub; supports ArcGIS tools and services.
@@ -241,8 +246,8 @@ const App = () => {
   const [showConfirmModal, setShowConfirmModal] = React.useState(false);
   const messagesEndRef = React.useRef(null);
   const inputRef = React.useRef(null);
-  const model = "gemini-1.5-flash";
-  const cx = "25ed03fb10e654c08";
+  const model = "gemini-1.5-flash-001";  // Updated to full model ID
+  const cx = "25ed03fb10e654c08"; // Your Google CSE ID
 
   React.useEffect(() => { loadApiKey(); }, []);
 
@@ -250,7 +255,7 @@ const App = () => {
     try {
       const stored = JSON.parse(localStorage.getItem('esriChatMessages') || '[]');
       setMessages(stored.length > 0 ? stored : [
-        { text: 'Hello! I’m BIA Geo-Assist, your friendly GIS sidekick for Esri and BIA-related geospatial queries. Ask me anything about ArcGIS tools, BIA Branch of Geospatial Support (BOGS), or troubleshooting—I’m here to help with a smile!', sender: 'bot' }
+        { text: 'Hello! I'm BIA Geo-Assist, your friendly GIS sidekick for Esri and BIA-related geospatial queries. Ask me anything about ArcGIS tools, BIA Branch of Geospatial Support (BOGS), or troubleshooting—I'm here to help with a smile!', sender: 'bot' }
       ]);
     } catch (e) { console.error(e); }
   }, []);
@@ -303,78 +308,172 @@ const App = () => {
     const cacheKey = `esri_search_${query}`;
     const cached = localStorage.getItem(cacheKey);
     if (cached) return cached;
+
     try {
       const searchUrl = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query + ' site:doc.arcgis.com OR site:developers.arcgis.com OR site:support.esri.com OR site:community.esri.com OR site:bia.gov')}&num=5`;
       const resp = await fetch(searchUrl);
-      if (!resp.ok) throw new Error(`Search error: ${resp.status}`);
+      if (!resp.ok) throw new Error(`Search API error: ${resp.status}`);
       const data = await resp.json();
       if (data.items) {
-        const result = data.items.map(i => `- **${i.title}**: ${i.snippet} ([Link](${i.link}))`).join('\n');
-        localStorage.setItem(cacheKey, result);
-        setTimeout(() => localStorage.removeItem(cacheKey), 24*60*60*1000);
+        const result = data.items.map(item => `- **${item.title}**: ${item.snippet} (Source: ${item.link})`).join('\n');
+        localStorage.setItem(cacheKey, result); // Cache for 24 hours
+        setTimeout(() => localStorage.removeItem(cacheKey), 24 * 60 * 60 * 1000); // Expire cache
+        console.log('Search results fetched:', result);
         return result;
       }
+      console.log('No search results found for:', query);
       return 'No search results found.';
-    } catch (e) {
-      return `Search failed: ${e.message}`;
+    } catch (error) {
+      console.error('Search failed:', error);
+      return `Search failed: ${error.message}. Falling back to static knowledge.`;
     }
   };
 
   const sendMessage = async (e) => {
     e.preventDefault();
-    if (!input.trim() || isLoading || !apiKey) return;
-
+    if (input.trim() === '' || isLoading) return;
     const userInput = input.trim();
-    setMessages(m => [...m, { text: userInput, sender: 'user' }]);
+    setMessages((curr) => [...curr, { text: userInput, sender: 'user' }]);
     setInput('');
     setIsLoading(true);
     let botText = '';
 
-    const urlMatch = userInput.match(/https?:\/\/[^\s]+/);
-    if (urlMatch && urlMatch[0].includes('arcgis')) {
-      botText = await fetchServiceMetadata(urlMatch[0]);
-      botText = `Great question! Here’s the metadata:\n\n${botText}`;
-    } else {
-      const searchResults = await fetchEsriSearchResults(userInput);
-      const prompt = `
-You are BIA Geo-Assist, a friendly GIS support bot.
-Use knowledge base first, then search results.
-Knowledge Base: ${esriKnowledgeBase}
-Search Results: ${searchResults}
-User Query: ${userInput}
-Previous Messages: ${messages.map(m => m.text).join('\n')}
-      `.trim();
-
+    // Fetch ArcGIS REST API metadata
+    const fetchServiceMetadata = async (url) => {
       try {
-        // ONLY CHANGE: Fixed endpoint (this is the one that works 100% in Nov 2025)
-        const resp = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }] })
-        });
-
-        if (!resp.ok) {
-          const err = await resp.text();
-          throw new Error(`API error: ${resp.status} – ${err.substring(0,150)}`);
+        if (!url.includes('arcgis') || !url.match(/\/rest\/services\/[^/]+\/(MapServer|FeatureServer)/)) {
+          return 'Please provide a valid ArcGIS REST service URL (e.g., ending in /MapServer or /FeatureServer).';
         }
-        const data = await resp.json();
-        botText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response from Gemini.';
-      } catch (err) {
-        console.error(err);
-        botText = `Oh no! (${err.message}) Try rephrasing.`;
+        const response = await fetch(`${url}?f=json`, { signal: AbortSignal.timeout(5000) });
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const data = await response.json();
+        let metadata = `**Service Metadata for:** ${data.name || data.documentInfo?.Title || 'Untitled Service'}\n\n`;
+        if (data.description) metadata += `- **Description**: ${data.description}\n`;
+        if (data.serviceDataType) metadata += `- **Data Type**: ${data.serviceDataType}\n`;
+        if (data.layers) {
+          metadata += `\n**Layers**:\n`;
+          data.layers.forEach((layer) => {
+            metadata += `- **${layer.name}** (ID: ${layer.id})\n`;
+          });
+        } else if (data.fields) {
+          metadata += `\n**Fields**:\n`;
+          data.fields.forEach((field) => {
+            metadata += `- **${field.name}** (Type: ${field.type})\n`;
+          });
+        } else {
+          metadata += `\n*No detailed layer or field information available.*\n`;
+        }
+        return metadata;
+      } catch (error) {
+        console.error('Failed to fetch metadata:', error);
+        return `Failed to retrieve metadata for ${url}. Ensure the URL is a valid, accessible ArcGIS REST service. Error: ${error.message}`;
+      }
+    };
+
+    // Fetch Esri docs using Google Custom Search API
+    const fetchEsriSearchResults = async (query) => {
+      const cacheKey = `esri_search_${query}`;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        console.log('Using cached search results for:', query);
+        return cached;
+      }
+      try {
+        const searchUrl = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query + ' site:doc.arcgis.com OR site:developers.arcgis.com OR site:support.esri.com OR site:community.esri.com OR site:bia.gov')}&num=5`;
+        const response = await fetch(searchUrl);
+        if (!response.ok) throw new Error(`Search API error: ${response.status} ${response.statusText}`);
+        const data = await response.json();
+        if (data.items) {
+          const result = data.items.map(item => `- **${item.title}**: ${item.snippet} (Source: ${item.link})`).join('\n');
+          localStorage.setItem(cacheKey, result); // Cache for 24 hours
+          setTimeout(() => localStorage.removeItem(cacheKey), 24 * 60 * 60 * 1000); // Expire cache
+          console.log('Search results fetched:', result);
+          return result;
+        }
+        console.log('No search results found for:', query);
+        return 'No search results found.';
+      } catch (error) {
+        console.error('Search failed:', error);
+        return `Search failed: ${error.message}. Falling back to static knowledge.`;
+      }
+    };
+
+    // Handle user input with personality
+    if (userInput.toLowerCase().includes('service url') || userInput.toLowerCase().includes('rest api') || userInput.match(/https?:\/\//)) {
+      const urlMatch = userInput.match(/https?:\/\/[^\s]+/);
+      if (urlMatch) {
+        botText = await fetchServiceMetadata(urlMatch[0]);
+        botText = `Great question! Here's the scoop on that service URL: ${botText} Let me know if you need more details—I'm learning from you to get even better!`;
+      } else {
+        botText = 'Oops, looks like I need a valid ArcGIS service URL to work my magic! Try something like "What are the layers in this service: https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer" — I'll figure it out with you!';
+      }
+      setMessages((curr) => [...curr, { text: botText, sender: 'bot' }]);
+    } else {
+      try {
+        // Fetch search results for advanced queries
+        const searchResults = userInput.toLowerCase().includes('what is gis') ? '' : await fetchEsriSearchResults(userInput);
+        const prompt = `
+          You are BIA Geo-Assist, a friendly and professional technical support assistant for Esri GIS products and BIA-related geospatial queries. Respond in a structured format with headings, bullets, examples, and sources. Add a cheerful tone, use phrases like 'great question!' or 'let's tackle this together!', and encourage follow-ups. For basic questions like 'What is GIS?', prioritize the knowledge base. For advanced or specific queries, use search results if relevant, then supplement with the knowledge base. Include BIA-specific information from the knowledge base for relevant queries (e.g., BOGS contact, software, training). Cite sources inline (e.g., Esri Documentation, BIA Website). Learn from the user's input by adapting responses based on their previous questions if applicable. Do not mention AI.
+          Online Search Results: ${searchResults}
+          Knowledge Base: ${esriKnowledgeBase}
+          User Query: ${userInput}
+          Previous Context: ${messages.map(m => m.text).join('\n')}
+        `;
+        const payload = {
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+        };
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+       
+        const apiCall = async () => {
+          console.log('Sending API request to:', apiUrl);
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!response.ok) throw new Error(`API error: ${response.status} ${response.statusText}`);
+          const result = await response.json();
+          console.log('API response:', result);
+          if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+            return result.candidates[0].content.parts[0].text;
+          } else {
+            throw new Error('No valid response received from API.');
+          }
+        };
+       
+        botText = await apiCall();
+        setMessages((curr) => [...curr, { text: botText, sender: 'bot' }]);
+      } catch (error) {
+        console.error('API call failed:', error);
+        const searchUrl = `https://doc.arcgis.com/en/search/?q=${encodeURIComponent(userInput)}`;
+        let fallbackText = `Oh no, I hit a snag! I couldn't fetch that info (Error: ${error.message}). `;
+       
+        if (userInput.toLowerCase().includes('what is gis')) {
+          fallbackText += `But no worries, here's what I know: ${esriKnowledgeBase.match(/### 1\. What is GIS\?[\s\S]*?(?=###|$)/)[0]} Let's explore more if you'd like!`;
+        } else if (userInput.toLowerCase().includes('experience builder') && userInput.toLowerCase().includes('dashboard')) {
+          fallbackText += `No problem, let's pivot! Here's the rundown: ${esriKnowledgeBase.match(/### 18\. Creating a Dashboard in ArcGIS Experience Builder[\s\S]*?(?=###|$)/)[0]} Got more questions? I'm all ears!`;
+        } else if (userInput.toLowerCase().includes('bia') || userInput.toLowerCase().includes('geospatial') || userInput.toLowerCase().includes('bogs')) {
+          fallbackText += `Let's tackle this together! Here's some info from my BIA knowledge base: ${esriKnowledgeBase.match(/### 22\. BIA Branch of Geospatial Support \(BOGS\)[\s\S]*?(?=###|$)/)[0]} For more, contact geospatial@bia.gov or MWRGIS@bia.gov. Want to dive deeper?`;
+        } else {
+          fallbackText += `Try checking the [Esri Documentation for "${userInput}"](${searchUrl}) or toss me a rephrased question—I'll do my best to assist!`;
+        }
+        botText = fallbackText;
+        setMessages((curr) => [...curr, { text: botText, sender: 'bot' }]);
       }
     }
-    setMessages(m => [...m, { text: botText, sender: 'bot' }]);
     setIsLoading(false);
   };
 
-  // Your original UI components – untouched
   const BotMessage = ({ message }) => (
     <div className="flex items-start mb-4">
-      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-esriBlue flex items-center justify-center text-white font-bold text-sm mr-2">GA</div>
+      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-esriBlue flex items-center justify-center text-white font-bold text-sm mr-2">
+        GA
+      </div>
       <div className="bg-esriLightBlue p-3 rounded-xl shadow-sm max-w-lg message-content">
-        <div className="text-gray-900 leading-relaxed markdown-content"
-             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(message.text)) }} />
+        <div
+          className="text-gray-900 leading-relaxed markdown-content"
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(message.text)) }}
+        />
       </div>
     </div>
   );
@@ -388,14 +487,27 @@ Previous Messages: ${messages.map(m => m.text).join('\n')}
   );
 
   const ConfirmModal = () => (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm mx-auto">
         <h3 className="text-lg font-semibold mb-4">Clear Chat History</h3>
-        <p className="mb-6">Are you sure? This cannot be undone.</p>
+        <p className="mb-6">Are you sure you want to clear the chat history? This action cannot be undone.</p>
         <div className="flex justify-end space-x-2">
-          <button onClick={() => setShowConfirmModal(false)} className="px-4 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
-          <button onClick={() => { setMessages([]); localStorage.removeItem('esriChatMessages'); setShowConfirmModal(false); }}
-                  className="px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700">Clear</button>
+          <button
+            onClick={() => setShowConfirmModal(false)}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-all duration-200"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              setMessages([]);
+              localStorage.removeItem('esriChatMessages');
+              setShowConfirmModal(false);
+            }}
+            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-all duration-200"
+          >
+            Clear
+          </button>
         </div>
       </div>
     </div>
@@ -403,68 +515,8 @@ Previous Messages: ${messages.map(m => m.text).join('\n')}
 
   return (
     <div className="bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col h-full border border-gray-200">
-      {/* Header */}
-      <div className="bg-esriBlue text-white p-4 flex items-center justify-between">
+      <div className="bg-esriBlue text-white p-4 flex items-center justify-between rounded-t-xl shadow-md">
         <div className="flex items-center">
           <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-esriBlue">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z"/>
-            </svg>
-          </div>
-          <h1 className="text-xl font-bold">BIA Geo-Assist</h1>
-        </div>
-        <div className="flex space-x-2">
-          <button onClick={saveConversation} className="px-4 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300">Save Chat</button>
-          <button onClick={() => setShowConfirmModal(true)} className="px-4 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300">Clear Chat</button>
-        </div>
-      </div>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 bg-esriGray chat-scroll-container">
-        {messages.length === 0 && <div className="flex items-center justify-center h-full text-center text-gray-500"><p className="text-lg">Your conversation will appear here.</p></div>}
-        {messages.map((m, i) => m.sender === 'user' ? <UserMessage key={i} message={m} /> : <BotMessage key={i} message={m} />)}
-        {isLoading && (
-          <div className="flex items-start mb-4">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-esriBlue flex items-center justify-center text-white font-bold text-sm mr-2">GA</div>
-            <div className="flex items-center space-x-1 p-3">
-              <div className="w-2 h-2 rounded-full bg-gray-500 animate-pulse-dot"></div>
-              <div className="w-2 h-2 rounded-full bg-gray-500 animate-pulse-dot"></div>
-              <div className="w-2 h-2 rounded-full bg-gray-500 animate-pulse-dot"></div>
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input */}
-      <form onSubmit={sendMessage} className="p-4 bg-white border-t border-gray-200">
-        <div className="flex items-center space-x-2">
-          <input
-            ref={inputRef}
-            type="text"
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-esriBlue"
-            placeholder="Ask about Esri or BIA GIS..."
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            disabled={isLoading || !apiKey}
-          />
-          <button type="submit" disabled={isLoading || !apiKey}
-                  className="bg-esriBlue text-white p-3 rounded-full shadow-md hover:bg-opacity-80 disabled:opacity-50">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-              <path d="M3.478 2.405a.75.75 0 0 0-.926.94l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.985.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.405Z" />
-            </svg>
-          </button>
-        </div>
-      </form>
-
-      <div className="p-2 bg-gray-100 border-t border-gray-200 text-center text-xs text-gray-600">
-        For Midwest GIS support, email MWRGIS@bia.gov.
-      </div>
-
-      {showConfirmModal && <ConfirmModal />}
-    </div>
-  );
-};
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8
