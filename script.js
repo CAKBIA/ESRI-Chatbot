@@ -236,9 +236,9 @@ const esriKnowledgeBase = `
 - **Request Process**: Become active ELA participant at https://www.bia.gov/service/geospatial-software/apply-ela. Contact Geospatial Support Help Desk at geospatial@bia.gov or the Regional Geospatial Coordinator at MWRGIS@bia.gov for access. Registration for events opens ~30 days prior.
 - **Sources**: https://www.bia.gov/service/geospatial-training, https://onemap-bia-geospatial.hub.arcgis.com/pages/training.
 ### 25. BIA Geospatial Open Data Hub
-- **Overview**: The BIA Open Data Portal[](https://onemap-bia-geospatial.hub.arcgis.com/) provides national level geospatial data in the public domain to support tribal community resiliency, research, and more. Maintained by the Branch of Geospatial Support. Serves as a repository for BIA geodata, applications, and resources.
-- **Available Data**: Data available for download as CSV, KML, Shapefile; accessible via web services for application development and data visualization. Includes datasets like BIA Tracts (interactive map for tracts, parcels, BIA lands).
-- **Applications**: StoryMaps, Web Applications, Web Maps for deeper data exploration.
+- **Overview**: The BIA Open Data Portal[](https://onemap-bia-geospatial.hub.arcgis.com/) provides national level geospatial data in the public domain to support tribal community resiliency, research, and more. Maintained by the Branch of Geospatial Support.
+- **Available Data**: Data available for download as CSV, KML, Shapefile; accessible via web services. Includes datasets like BIA Tracts.
+- **Applications**: StoryMaps, Web Applications, Web Maps.
 - **Access**: Public access; no cost. For contributions or support, contact geospatial@bia.gov or the Regional Geospatial Coordinator at MWRGIS@bia.gov.
 - **Integration with Esri**: Built on ArcGIS Hub; supports ArcGIS tools and services.
 - **Sources**: https://onemap-bia-geospatial.hub.arcgis.com/, https://catalog.data.gov/dataset/bia-bogs-onemap.
