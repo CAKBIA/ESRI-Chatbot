@@ -8,7 +8,7 @@ if (typeof marked === 'undefined') {
     const App = () => {
       const [messages, setMessages] = React.useState([]);
       const [input, setInput] = React.useState('');
-      const [isLoading, setIsLoading] = React.useState(false);
+      const [isLoading, setIsLoading] = React.useState(false);const sendMessage = async (e) => {
       const [showConfirmModal, setShowConfirmModal] = React.useState(false);
       const messagesEndRef = React.useRef(null);
       const inputRef = React.useRef(null);
@@ -304,107 +304,78 @@ if (typeof marked === 'undefined') {
 - **Sources**: https://onemap-bia-geospatial.hub.arcgis.com/, https://catalog.data.gov/dataset/bia-bogs-onemap.
       `.trim();
 
-      const sendMessage = async (e) => {
+            const sendMessage = async (e) => {
         e.preventDefault();
-        if (input.trim() === '' || isLoading) return;
+        if (!input.trim() || isLoading) return;
 
         const userInput = input.trim();
-        setMessages((curr) => [...curr, { text: userInput, sender: 'user' }]);
+        setMessages(curr => [...curr, { text: userInput, sender: 'user' }]);
         setInput('');
         setIsLoading(true);
-
         let botText = '';
 
-        // Fetch ArcGIS REST API metadata
-        const fetchServiceMetadata = async (url) => {
-          try {
-            if (!url.includes('arcgis') || !url.match(/\/rest\/services\/[^/]+\/(MapServer|FeatureServer)/)) {
-              return 'Please provide a valid ArcGIS REST service URL (e.g., ending in /MapServer or /FeatureServer).';
-            }
-            const response = await fetch(`${url}?f=json`, { signal: AbortSignal.timeout(5000) });
-            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            const data = await response.json();
+        // ——— REST SERVICE URL DETECTION ———
+        if (userInput.toLowerCase().includes('service url') || 
+            userInput.toLowerCase().includes('rest api') || 
+            /https?:\/\//i.test(userInput)) {
 
-            let metadata = `**Service Metadata for:** ${data.name || data.documentInfo?.Title || 'Untitled Service'}\n\n`;
-            if (data.description) metadata += `- **Description**: ${data.description}\n`;
-            if (data.serviceDataType) metadata += `- **Data Type**: ${data.serviceDataType}\n`;
-            if (data.layers) {
-              metadata += `\n**Layers**:\n`;
-              data.layers.forEach((layer) => {
-                metadata += `- **${layer.name}** (ID: ${layer.id})\n`;
-              });
-            } else if (data.fields) {
-              metadata += `\n**Fields**:\n`;
-              data.fields.forEach((field) => {
-                metadata += `- **${field.name}** (Type: ${field.type})\n`;
-              });
-            } else {
-              metadata += `\n*No detailed layer or field information available.*\n`;
-            }
-            return metadata;
-          } catch (error) {
-            console.error('Failed to fetch metadata:', error);
-            return `Failed to retrieve metadata for ${url}. Ensure the URL is a valid, accessible ArcGIS REST service. Error: ${error.message}`;
-          }
-        };
-
-        // Fetch Esri docs using Google Custom Search API
-        const fetchEsriSearchResults = async (query) => {
-          const cacheKey = `esri_search_${query}`;
-          const cached = localStorage.getItem(cacheKey);
-          if (cached) {
-            console.log('Using cached search results for:', query);
-            return cached;
-          }
-
-          try {
-            const searchUrl = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query + ' site:doc.arcgis.com OR site:developers.arcgis.com OR site:support.esri.com OR site:community.esri.com OR site:bia.gov')}&num=5`;
-            const response = await fetch(searchUrl);
-            if (!response.ok) throw new Error(`Search API error: ${response.status} ${response.statusText}`);
-            const data = await response.json();
-            if (data.items) {
-              const result = data.items.map(item => `- **${item.title}**: ${item.snippet} (Source: ${item.link})`).join('\n');
-              localStorage.setItem(cacheKey, result); // Cache for 24 hours
-              setTimeout(() => localStorage.removeItem(cacheKey), 24 * 60 * 60 * 1000); // Expire cache
-              console.log('Search results fetched:', result);
-              return result;
-            }
-            console.log('No search results found for:', query);
-            return 'No search results found.';
-          } catch (error) {
-            console.error('Search failed:', error);
-            return `Search failed: ${error.message}. Falling back to static knowledge.`;
-          }
-        };
-
-        // Exponential backoff for API calls
-        const callApiWithBackoff = async (apiCall, retries = 5, delay = 1000) => {
-          try {
-            return await apiCall();
-          } catch (error) {
-            console.error('API call attempt failed:', error);
-            if (retries > 0) {
-              console.log(`Retrying API call, ${retries} retries left, waiting ${delay}ms`);
-              await new Promise(res => setTimeout(res, delay));
-              return callApiWithBackoff(apiCall, retries - 1, delay * 2);
-            } else {
-              throw error;
-            }
-          }
-        };
-
-        // Handle user input with personality
-        if (userInput.toLowerCase().includes('service url') || userInput.toLowerCase().includes('rest api') || userInput.match(/https?:\/\//)) {
-          const urlMatch = userInput.match(/https?:\/\/[^\s]+/);
+          const urlMatch = userInput.match(/(https?:\/\/[^\s]+)/);
           if (urlMatch) {
-            botText = await fetchServiceMetadata(urlMatch[0]);
-            botText = `Great question! Here’s the scoop on that service URL: ${botText} Let me know if you need more details—I’m learning from you to get even better!`;
+            botText = await fetchServiceMetadata(urlMatch[1]);
+            botText = `Great question! Here’s what I found for that service:\n\n${botText}\n\nAnything else you need?`;
           } else {
-            botText = 'Oops, looks like I need a valid ArcGIS service URL to work my magic! Try something like "What are the layers in this service: https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer" — I’ll figure it out with you!';
+            botText = 'Hmm, I didn’t catch a valid URL. Paste something like:\n`https://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer` and I’ll break it down for you!';
           }
-          setMessages((curr) => [...curr, { text: botText, sender: 'bot' }]);
-        } else {
-          try {
+          setMessages(curr => [...curr, { text: botText, sender: 'bot' }]);
+          setIsLoading(false);
+          return;
+        }
+
+        // ——— MAIN GROK CALL (hard-coded key, no Gemini leftovers) ———
+        try {
+          const response = await fetch('https://api.x.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer xai-rMi96KGSeqiSviZroMJKWgpx2Og5LLAJgH5tdppIgt6jKxilVqM5VtVB97ELirGf3rqemD0JYtkq125G'
+            },
+            body: JSON.stringify({
+              model: 'grok-4-latest',
+              messages: [
+                { role: "system", content: `You are BIA Geo-Assist, a friendly and professional GIS expert for Esri and BIA. Use this knowledge base when relevant:\n\n${esriKnowledgeBase}` },
+                { role: "user",   content: userInput }
+              ],
+              temperature: 0.7,
+              max_tokens: 2000
+            })
+          });
+
+          if (!response.ok) {
+            const err = await response.text();
+            throw new Error(`Grok ${response.status}: ${err}`);
+          }
+
+          const data = await response.json();
+          botText = data.choices[0].message.content.trim();
+
+        } catch (error) {
+          console.error('Grok failed:', error);
+          const searchUrl = `https://doc.arcgis.com/en/search/?q=${encodeURIComponent(userInput)}`;
+          botText = `Oh no, I hit a snag! (${error.message})\n\n`;
+          if (userInput.toLowerCase().includes('what is gis')) {
+            botText += esriKnowledgeBase.match(/### 1\. What is GIS\?[\s\S]*?(?=###|$)/)[0];
+          } else if (userInput.toLowerCase().includes('experience builder') && userInput.toLowerCase().includes('dashboard')) {
+            botText += esriKnowledgeBase.match(/### 18\. Creating a Dashboard in ArcGIS Experience Builder[\s\S]*?(?=###|$)/)[0];
+          } else if (/bia|bogs|geospatial/i.test(userInput)) {
+            botText += esriKnowledgeBase.match(/### 22\. BIA Branch of Geospatial Support \(BOGS\)[\s\S]*?(?=###|$)/)[0];
+          } else {
+            botText += `Try the Esri docs directly → [Search "${userInput}"](${searchUrl}) or rephrase your question!`;
+          }
+        }
+
+        setMessages(curr => [...curr, { text: botText, sender: 'bot' }]);
+        setIsLoading(false);
+      };
             // Fetch search results for advanced queries
             const searchResults = userInput.toLowerCase().includes('what is gis') ? '' : await fetchEsriSearchResults(userInput);
             const prompt = `
