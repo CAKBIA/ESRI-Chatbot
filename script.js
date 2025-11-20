@@ -304,6 +304,58 @@ if (typeof marked === 'undefined') {
 - **Sources**: https://onemap-bia-geospatial.hub.arcgis.com/, https://catalog.data.gov/dataset/bia-bogs-onemap.
       `.trim();
 
+                // ——————————————————————————————
+      // ADD THIS ENTIRE FUNCTION HERE
+      // ——————————————————————————————
+      const fetchServiceMetadata = async (url) => {
+        try {
+          // Basic validation
+          if (!url.includes('arcgis')) {
+            return 'That doesn’t look like an ArcGIS REST service URL.';
+          }
+
+          // Clean the URL and fetch ?f=json
+          const cleanUrl = url.trim().replace(/\?.*$/, '');
+          const response = await fetch(`${cleanUrl}?f=json`, {
+            signal: AbortSignal.timeout(8000)
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status} ${response.statusText}`);
+          }
+
+          const data = await response.json();
+
+          let result = `**${data.serviceDescription || data.name || 'ArcGIS Service'}**\n\n`;
+
+          if (data.description) result += `${data.description}\n\n`;
+          if (data.currentVersion) result += `**Version**: ${data.currentVersion}\n`;
+          if (data.supportedExtensions) result += `**Extensions**: ${data.supportedExtensions}\n`;
+
+          if (data.layers && data.layers.length > 0) {
+            result += `\n**Layers (${data.layers.length})**:\n`;
+            data.layers.forEach(l => {
+              result += `- ${l.name} (ID: ${l.id})\n`;
+            });
+          }
+
+          if (data.tables && data.tables.length > 0) {
+            result += `\n**Tables**:\n`;
+            data.tables.forEach(t => {
+              result += `- ${t.name} (ID: ${t.id})\n`;
+            });
+          }
+
+          return result.trim();
+
+        } catch (err) {
+          console.error('Metadata fetch failed:', err);
+          return `I couldn't read that service.\nError: ${err.message}\n\nMake sure it's a public ArcGIS REST endpoint ending in MapServer, FeatureServer, etc.`;
+        }
+      };
+      // ——————————————————————————————
+      // END OF THE FUNCTION TO ADD
+      // ——————————————————————————————
                   const sendMessage = async (e) => {
         e.preventDefault();
         if (!input.trim() || isLoading) return;
