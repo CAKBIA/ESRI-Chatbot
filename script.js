@@ -8,13 +8,13 @@ if (typeof marked === 'undefined') {
     const App = () => {
       const [messages, setMessages] = React.useState([]);
       const [input, setInput] = React.useState('');
-      const [isLoading, setIsLoading] = React.useState(false);const sendMessage = async (e) => {
+            const [isLoading, setIsLoading] = React.useState(false);
       const [showConfirmModal, setShowConfirmModal] = React.useState(false);
       const messagesEndRef = React.useRef(null);
       const inputRef = React.useRef(null);
+
       const apiKey = "xai-rMi96KGSeqiSviZroMJKWgpx2Og5LLAJgH5tdppIgt6jKxilVqM5VtVB97ELirGf3rqemD0JYtkq125G";
-      const model = "grok-4-latest";   // we don’t actually use this anymore, but keep it so nothing breaks
-      const cx = "25ed03fb10e654c08"; // Replace with your Google CSE ID
+      const cx = "25ed03fb10e654c08";
 
       // Load stored messages or initial welcome
       React.useEffect(() => {
