@@ -16,7 +16,6 @@ const App = () => {
   
   // NOTE: You still need a Google API Key here for the Custom Search to work (lines 164+)
   // If you don't want search, you can leave this blank, but the search function will fail.
-  const apiKey = "YOUR_GOOGLE_SEARCH_API_KEY"; 
   const cx = "25ed03fb10e654c08"; // Your Google CSE ID
 
   // Load stored messages or initial welcome
