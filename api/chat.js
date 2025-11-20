@@ -1,40 +1,36 @@
-// /api/chat.js  (Vercel Serverless API Route)
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { userInput } = req.body;
+    const { messages } = req.body;
 
-    if (!userInput) {
-      return res.status(400).json({ error: 'Missing userInput' });
-    }
-
-    const apiKey = process.env.XAI_API_KEY;
-
-    if (!apiKey) {
-      return res.status(500).json({ error: 'API key missing on server' });
-    }
-
-    const aiRes = await fetch("https://api.x.ai/v1/chat/completions", {
-      method: "POST",
+    // Gemini API call
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.GEMINI_API_KEY}` // secure key
       },
       body: JSON.stringify({
-        model: "grok-2-latest",
-        messages: [{ role: "user", content: userInput }]
+        model: 'gemini-1.5',   // replace with the specific Gemini model you want
+        messages,
+        temperature: 0.7,
+        max_tokens: 2000
       })
     });
 
-    const data = await aiRes.json();
-    return res.status(aiRes.status).json(data);
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Gemini API error: ${text}`);
+    }
+
+    const data = await response.json();
+    res.status(200).json(data);
 
   } catch (err) {
-    console.error("Error:", err);
-    return res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 }
