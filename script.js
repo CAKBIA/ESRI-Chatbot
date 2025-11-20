@@ -485,27 +485,32 @@ tailwind.config = {
               User Query: ${userInput}
               Previous Context: ${messages.map(m => m.text).join('\n')}
             `;
-            const payload = {
-              contents: [{ role: "user", parts: [{ text: prompt }] }],
-            };
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-            
+            // ✅ PASTE THIS NEW BLOCK ✅
             const apiCall = async () => {
-              console.log('Sending API request to:', apiUrl);
-              const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-              });
-              if (!response.ok) throw new Error(`API error: ${response.status} ${response.statusText}`);
-              const result = await response.json();
-              console.log('API response:', result);
-              if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
-                return result.candidates[0].content.parts[0].text;
-              } else {
-                throw new Error('No valid response received from API.');
-              }
-            };
+  console.log('Sending request to Serverless Function...');
+  
+  // This calls the file you just created at api/chat.js
+  const response = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    // We send the 'prompt' variable (which includes your Esri knowledge base) 
+    // as 'userInput' because that is what your api/chat.js expects.
+    body: JSON.stringify({ userInput: prompt }),
+  });
+
+  if (!response.ok) throw new Error(`Server error: ${response.status}`);
+  
+  const result = await response.json();
+  
+  // Your new backend (Grok) returns data in a standard format (different from Gemini)
+  if (result.choices && result.choices.length > 0) {
+      return result.choices[0].message.content;
+  } else if (result.error) {
+      throw new Error(result.error);
+  } else {
+      throw new Error('No valid response received from AI.');
+  }
+};
             
             botText = await callApiWithBackoff(apiCall);
             setMessages((curr) => [...curr, { text: botText, sender: 'bot' }]);
