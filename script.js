@@ -1,18 +1,3 @@
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        esriBlue: '#292b47',
-        esriLightBlue: '#9496b3',
-        esriGray: '#f8f8f8',
-      },
-      fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-      },
-    },
-  },
-};
-
 // Check for marked.js and DOMPurify availability
 if (typeof marked === 'undefined') {
   console.error('Marked.js failed to load. Falling back to plain text.');
