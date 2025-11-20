@@ -1,66 +1,32 @@
-// /api/chat.js
-// THIS VERSION IS FOR GOOGLE GEMINI
+// api/chat.js
+import { GoogleGenAI } from '@google/genai';
+
+// 1. This variable is only accessible inside this function on the server.
+const apiKey = process.env.ESRIChatbot; 
+const ai = new GoogleGenAI(apiKey);
 
 export default async function handler(req, res) {
-  // 1. Only allow POST requests
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
+
+  // Get the prompt from the client's request body
+  const { prompt } = req.body; 
+
+  if (!prompt) {
+    return res.status(400).json({ error: 'Missing prompt in request body.' });
   }
 
   try {
-    // 2. Get the API Key from Vercel Environment Variables
-    // MAKE SURE your variable in Vercel is named "ESRIChatbot"
-    const apiKey = process.env.ESRIChatbot; 
-
-    if (!apiKey) {
-      return res.status(500).json({ error: "Server Error: Missing API Key in Vercel" });
-    }
-
-    // 3. Get the user input
-    const { userInput } = req.body;
-
-    if (!userInput) {
-      return res.status(400).json({ error: "No input provided" });
-    }
-
-    // 4. Call Google Gemini API (Using the stable 1.5 Flash model)
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-    
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: userInput }] }]
-      })
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash-001",
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
     });
 
-    const data = await response.json();
-
-    // 5. Check for errors from Google
-    if (data.error) {
-        throw new Error(data.error.message || "Unknown error from Google Gemini");
-    }
-
-    // 6. Extract the text answer
-    // Gemini hides the text deep in this structure: candidates[0].content.parts[0].text
-    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!aiText) {
-        throw new Error("Gemini returned no text.");
-    }
-
-    // 7. Send back to frontend
-    // We wrap it in this specific structure so your script.js works without changes
-    res.status(200).json({ 
-        choices: [
-            { message: { content: aiText } }
-        ] 
-    });
-
-  } catch (err) {
-    console.error("API route error:", err);
-    res.status(500).json({ error: err.message });
+    // 2. Send the clean response back to your client-side code
+    res.status(200).json({ text: response.candidates[0].content.parts[0].text });
+  } catch (error) {
+    console.error('Serverless Function Error:', error);
+    res.status(500).json({ error: 'Failed to generate content from Google AI.' });
   }
 }
