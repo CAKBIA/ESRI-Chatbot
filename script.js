@@ -17,9 +17,7 @@ const App = () => {
   // NOTE: You still need a Google API Key here for the Custom Search to work (lines 164+)
   // If you don't want search, you can leave this blank, but the search function will fail.
   const cx = "25ed03fb10e654c08"; // Your Google CSE ID
-  const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;   // ← NEW
-  if (!apiKey) console.warn("VITE_GOOGLE_API_KEY is missing – search will fail"); // ← NEW
-
+  
   // Load stored messages or initial welcome
   React.useEffect(() => {
     try {
