@@ -17,7 +17,7 @@ const App = () => {
   // NOTE: You still need a Google API Key here for the Custom Search to work (lines 164+)
   // If you don't want search, you can leave this blank, but the search function will fail.
   const cx = "25ed03fb10e654c08"; // Your Google CSE ID
-  
+
   // Load stored messages or initial welcome
   React.useEffect(() => {
     try {
@@ -399,7 +399,8 @@ For contributions or support, contact geospatial@bia.gov or the Regional Geospat
     } else {
       try {
         // Fetch search results for advanced queries
-        const searchResults = await fetchEsriSearchResults(userInput);
+        const searchResults = userInput.toLowerCase().includes('what is gis') ?
+          '' : await fetchEsriSearchResults(userInput);
         const prompt = `
               You are BIA Geo-Assist, a friendly and professional technical support assistant for Esri GIS products and BIA-related geospatial queries.
               Respond in a structured format with headings, bullets, examples, and sources. Add a cheerful tone, use phrases like 'great question!'
