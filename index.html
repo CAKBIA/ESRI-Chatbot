@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BIA Geo-Assist</title>
 
+    <script>
+        window.process = { env: { NODE_ENV: 'production' } };
+    </script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         // Your custom Tailwind configuration
@@ -23,7 +27,6 @@
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="style.css" />
 
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -38,7 +41,6 @@
 <body class="bg-gray-100 font-sans flex items-center justify-center min-h-screen p-4">
     <div id="root" class="w-full max-w-2xl h-[90vh] flex flex-col chat-container"></div>
 
-    <script src="script.js" type="text/babel" data-type="module"></script>
+    <script src="script.js" type="text/babel"></script>
 </body>
 </html>
-
