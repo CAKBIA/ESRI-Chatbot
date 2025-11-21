@@ -23,8 +23,8 @@ export default async function handler(req, res) {
     // 4. Initialize Google AI
     const genAI = new GoogleGenerativeAI(apiKey);
     
-    // 🚨 FIX HERE: Use the fully qualified, stable model name
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-001" }); 
+    // 🚨 FINAL FIX HERE: Use the current recommended model alias
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); 
 
     // 5. Generate Content
     const result = await model.generateContent(prompt);
