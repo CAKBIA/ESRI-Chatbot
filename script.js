@@ -399,8 +399,8 @@ For contributions or support, contact geospatial@bia.gov or the Regional Geospat
     } else {
       try {
         // Fetch search results for advanced queries
-        // Always search – no more skipping "what is gis"
-        const searchResults = await fetchEsriSearchResults(userInput);
+        const searchResults = userInput.toLowerCase().includes('what is gis') ?
+          '' : await fetchEsriSearchResults(userInput);
         const prompt = `
               You are BIA Geo-Assist, a friendly and professional technical support assistant for Esri GIS products and BIA-related geospatial queries.
               Respond in a structured format with headings, bullets, examples, and sources. Add a cheerful tone, use phrases like 'great question!'
