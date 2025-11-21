@@ -18,16 +18,6 @@ const App = () => {
   // If you don't want search, you can leave this blank, but the search function will fail.
   const cx = "25ed03fb10e654c08"; // Your Google CSE ID
 
-  // THIS LINE WORKS NO MATTER WHAT YOU NAMED YOUR KEY IN VERCEL
-  const apiKey = 
-    process.env.REACT_APP_GOOGLE_API_KEY ||     // if you ever use the standard name
-    process.env.VITE_GOOGLE_API_KEY ||          // if you used VITE_ prefix
-    process.env.GOOGLE_API_KEY ||               // if you used plain GOOGLE_API_KEY
-    process.env.GOOGLE_CSE_KEY ||               // some people use this
-    "";                                         // fallback = empty if nothing found
-
-  if (!apiKey) console.warn("Google API key not found – search disabled");
-
   // Load stored messages or initial welcome
   React.useEffect(() => {
     try {
