@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/genai';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -16,13 +16,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Initialize with the stable SDK
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = new GoogleGenerativeAI({ apiKey });
     
-    // Use 'gemini-1.5-flash' which is the current standard model
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // FIX: Use 'gemini-1.5-flash-001' which is the specific stable version identifier
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-001" });
 
-    const result = await model.generateContent(prompt);
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    });
+    
     const response = await result.response;
     const text = response.text();
 
@@ -30,7 +32,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Google API Error:', error);
-    // 🚨 Pass the REAL error message to the frontend so we can see it
     return res.status(500).json({ error: error.message });
   }
 }
