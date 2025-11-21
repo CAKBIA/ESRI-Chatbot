@@ -419,28 +419,31 @@ For contributions or support, contact geospatial@bia.gov or the Regional Geospat
         // NEW SERVERLESS CALL (Replaces the old Google Gemini call)
         // ---------------------------------------------------------
         const apiCall = async () => {
-          console.log("Sending request to Serverless Function...");
+          console.log("Sending request to Serverless Function...");
 
-          const response = await fetch("/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userInput: prompt }), // <-- This line sends the wrong key
-          });
+          const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            // ✅ FIX 1: We send 'prompt' because that is what api/chat.js asks for
+            body: JSON.stringify({ prompt: prompt }),
+          });
 
-          if (!response.ok)
-            throw new Error(`Server error: ${response.status}`);
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Server error: ${response.status} - ${errorData.error}`);
+          }
 
-          const result = await response.json();
+          const result = await response.json();
 
-          // Check for OpenAI/Grok standard response format
-          if (result.choices && result.choices.length > 0) {
-            return result.choices[0].message.content;
-          } else if (result.error) {
-            throw new Error(result.error);
-          } else {
-            throw new Error("No valid response received from AI.");
-          }
-        };
+          // ✅ FIX 2: We check for 'text' because that is what api/chat.js returns
+          if (result.text) {
+            return result.text;
+          } else if (result.error) {
+            throw new Error(result.error);
+          } else {
+            throw new Error("No valid response received from AI.");
+          }
+        };
 
         botText = await apiCall();
         setMessages((curr) => [...curr, { text: botText, sender: 'bot' }]);
