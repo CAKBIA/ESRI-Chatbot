@@ -1,9 +1,9 @@
 // api/chat.js
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/genai';
 
 // 1. This variable is only accessible inside this function on the server.
 const apiKey = process.env.ESRIChatbot; 
-const ai = new GoogleGenAI(apiKey);
+const ai = new GoogleGenerativeAI({ apiKey });
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
