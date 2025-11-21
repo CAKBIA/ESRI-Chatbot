@@ -1,32 +1,40 @@
 // api/chat.js
-import { GoogleGenerativeAI } from '@google/genai';
-
-// 1. This variable is only accessible inside this function on the server.
-const apiKey = process.env.ESRIChatbot; 
-const ai = new GoogleGenerativeAI({ apiKey });
+// We use the stable SDK: @google/generative-ai
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export default async function handler(req, res) {
+  // 1. Check method
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  // Get the prompt from the client's request body
-  const { prompt } = req.body; 
+  // 2. Check API Key
+  const apiKey = process.env.ESRIChatbot;
+  if (!apiKey) {
+    console.error("Error: ESRIChatbot environment variable is missing.");
+    return res.status(500).json({ error: 'Server configuration error: API Key missing.' });
+  }
 
+  // 3. Get Prompt
+  const { prompt } = req.body;
   if (!prompt) {
     return res.status(400).json({ error: 'Missing prompt in request body.' });
   }
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-001",
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-    });
+    // 4. Call Gemini API
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    // 2. Send the clean response back to your client-side code
-    res.status(200).json({ text: response.candidates[0].content.parts[0].text });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    // 5. Send text back
+    return res.status(200).json({ text: text });
+
   } catch (error) {
-    console.error('Serverless Function Error:', error);
-    res.status(500).json({ error: 'Failed to generate content from Google AI.' });
+    console.error('Gemini API Error:', error);
+    return res.status(500).json({ error: 'AI Generation Failed', details: error.message });
   }
 }
